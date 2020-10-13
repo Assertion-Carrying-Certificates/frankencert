@@ -29,7 +29,7 @@ def generate_cert(certificates, pkey, signing_key, issuer, max_extensions, \
                   ext_mod_probability=0.0, invalid_ts_probability = 0.0, \
                   hash_for_sign="sha1", randomize_serial=False):
     cert = crypto.X509()
-   
+    cert.set_version(2) # v3
 
     cert.set_pubkey(pkey)
     pick = random.choice(certificates)
@@ -65,7 +65,7 @@ def generate_cert(certificates, pkey, signing_key, issuer, max_extensions, \
     # then pick one entry randomly from each type
     # Hacked pyOpenSSL to support poking into the data
     # TODO: Multiple extensions of the same type?
-    sample = random.randint(0, max_extensions)
+    sample = random.randint(1, max_extensions) # min 1 extension
     choices = random.sample(extensions.keys(), sample)
     new_extensions = [random.choice(list(extensions[name])) for name in choices]
     for extension in new_extensions:
@@ -120,7 +120,7 @@ def generate(certificates, ca_cert, ca_key, fconfig, count=1, \
         signing_key = ca_key
         issuer = ca_cert.get_subject()
         key = None
-        length = random.randint(1,max_depth)
+        length = random.randint(2,max_depth)
         if length == 1 and random.random() < self_signed_probability:
             issuer = None
         for j in range(length):
